@@ -1,0 +1,14 @@
+- name: Configure SELinux and Firewall
+  import_playbook: playbooks/selinux-firewall.yml
+
+- name: Apply common configuration
+  import_playbook: playbooks/install-kubernetes.yml
+
+- name: Setup Kubernetes master
+  import_playbook: playbooks/k8s-master.yml
+
+- name: Configure Kubernetes networking
+  import_playbook: playbooks/k8s-network.yml
+
+- name: Install Helm
+  import_playbook: playbooks/helm.yml
