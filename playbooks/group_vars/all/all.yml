@@ -1,0 +1,31 @@
+---
+docker_username: creativefree
+kubernetes_version: "latest"
+pod_network_cidr: "10.244.0.0/16"
+app_namespace: product-feedback
+
+helm_charts:
+  - name: "my-ingress-chart"
+    version: "0.1.0"
+    release_name: "product-feedback-ingress"
+    namespace: "product-feedback"
+    set_values:
+      - "ingress.namespace=product-feedback"
+  - name: "cert-manager"
+    version: "0.2.0"
+    release_name: "product-feedback-cert"
+    namespace: "product-feedback"
+    set_values:
+      - "certificate.namespace=product-feedback"
+      - "certificate.issuerRef.name=letsencrypt-staging"
+      - "issuers.type=letsencrypt"
+      - "issuers.letsencrypt.name=letsencrypt-staging"
+      - "issuers.letsencrypt.server=https://acme-staging-v02.api.letsencrypt.org/directory"
+  - name: "product-feedback-api"
+    version: "0.3.0"
+    release_name: "product-feedback-api"
+    namespace: "product-feedback"
+  - name: "product-feedback-app"
+    version: "0.2.0"
+    release_name: "product-feedback-app"
+    namespace: "product-feedback"

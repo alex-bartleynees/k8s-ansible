@@ -1,0 +1,35 @@
+- name: Deploy Helm Charts
+  hosts: k8s_master
+  become: false
+  vars:
+    kube_config_dir: "/home/{{ ansible_user }}/.kube"
+
+  tasks:
+    - name: Install charts from Docker Hub
+      loop: "{{ helm_charts }}"
+      command: >
+        helm upgrade --install {{ item.release_name }}
+        oci://registry-1.docker.io/{{ docker_username }}/{{ item.name }}
+        --version {{ item.version }}
+        --namespace {{ item.namespace }}
+        --create-namespace
+        --set-string global.namespace={{ item.namespace }}
+        --set-string nameOverride={{ item.namespace }}
+        {% if item.set_values is defined %}
+        {% for value in item.set_values %}
+        --set {{ value }}
+        {% endfor %}
+        {% endif %}
+      environment:
+        KUBECONFIG: "{{ kube_config_dir }}/config"
+
+    - name: Show all deployed releases
+      command: helm ls -A
+      environment:
+        KUBECONFIG: "{{ kube_config_dir }}/config"
+      register: helm_ls
+      changed_when: false
+
+    - name: Display releases
+      debug:
+        var: helm_ls.stdout_lines

@@ -65,8 +65,21 @@
         recurse: yes
       become: true
 
-    - name: Remove master node taint for single-node setup
-      command: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+    - name: Remove taints for single-node setup
+      shell: |
+        kubectl taint nodes --all node-role.kubernetes.io/control-plane- || true
+        kubectl taint nodes --all node-role.kubernetes.io/master- || true  # for older k8s versions
       when: allow_pods_on_master
-      ignore_errors: true
       changed_when: false
+      register: taint_result
+      failed_when: false # Don't fail if taints don't exist
+
+    - name: Verify node taints
+      command: kubectl describe nodes
+      register: node_status
+      changed_when: false
+
+    - name: Display node taints
+      debug:
+        msg: "Current node taints: {{ node_status.stdout | regex_findall('Taints:.*') }}"
+      when: node_status.stdout is defined

@@ -1,0 +1,26 @@
+---
+- name: Install NGINX Ingress Controller
+  hosts: k8s_master
+  become: false
+  vars:
+    kube_config_dir: "/home/{{ ansible_user }}/.kube"
+
+  tasks:
+    - name: Install NGINX Ingress Controller
+      command: >
+        helm upgrade --install ingress-nginx ingress-nginx
+        --repo https://kubernetes.github.io/ingress-nginx
+        --namespace ingress-nginx
+        --create-namespace
+        --set controller.hostNetwork=true
+        --set controller.service.type=""
+        --set controller.kind=DaemonSet
+      environment:
+        KUBECONFIG: "{{ kube_config_dir }}/config"
+      register: nginx_install
+      changed_when: nginx_install.rc == 0
+
+    - name: Wait for NGINX Ingress pods to be ready
+      command: kubectl -n ingress-nginx wait --for=condition=Ready pods --selector=app.kubernetes.io/component=controller --timeout=300s
+      environment:
+        KUBECONFIG: "{{ kube_config_dir }}/config"

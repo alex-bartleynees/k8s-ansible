@@ -14,6 +14,10 @@
       - 10259 # kube-scheduler webhook
       - 179 # Calico BGP
       - 30000-32767 # NodePort Services range
+      - 80 # HTTP
+      - 443 # HTTPS
+      - 30080 # NGINX Ingress HTTP NodePort
+      - 30443 # NGINX Ingress HTTPS NodePort
     configure_firewall: true # Set to true if you want to use firewalld
 
   tasks:
@@ -51,6 +55,7 @@
         state: enabled
         immediate: yes
       with_items: "{{ k8s_ports_tcp }}"
+      when: configure_firewall
 
     - name: Configure UDP port for Flannel VXLAN
       firewalld:
@@ -58,15 +63,18 @@
         permanent: yes
         state: enabled
         immediate: yes
+      when: configure_firewall
 
     - name: Reload firewall
       command: firewall-cmd --reload
       changed_when: true
+      when: configure_firewall
 
     - name: Show current firewall configuration
       command: firewall-cmd --list-all
       register: firewall_rules
       changed_when: false
+      when: configure_firewall
 
     - name: Display firewall rules
       debug:
