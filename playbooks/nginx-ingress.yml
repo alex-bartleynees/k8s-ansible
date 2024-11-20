@@ -15,6 +15,14 @@
         --set controller.hostNetwork=true
         --set controller.service.type=""
         --set controller.kind=DaemonSet
+        --set controller.resources.requests.cpu=100m
+        --set controller.resources.requests.memory=256Mi
+        --set controller.resources.limits.cpu=500m
+        --set controller.resources.limits.memory=512Mi
+        --set controller.config.proxy-body-size=10m
+        --set controller.config.proxy-connect-timeout=10
+        --set controller.config.proxy-read-timeout=120
+        --set controller.config.proxy-send-timeout=120
       environment:
         KUBECONFIG: "{{ kube_config_dir }}/config"
       register: nginx_install
