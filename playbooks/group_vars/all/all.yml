@@ -6,7 +6,7 @@ app_namespace: product-feedback
 
 helm_charts:
   - name: "my-ingress-chart"
-    version: "0.1.0"
+    version: "0.3.0"
     release_name: "product-feedback-ingress"
     namespace: "product-feedback"
     set_values:
@@ -26,6 +26,6 @@ helm_charts:
     release_name: "product-feedback-api"
     namespace: "product-feedback"
   - name: "product-feedback-app"
-    version: "0.2.0"
+    version: "0.3.0"
     release_name: "product-feedback-app"
     namespace: "product-feedback"
