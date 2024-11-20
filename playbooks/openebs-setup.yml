@@ -25,6 +25,7 @@
         --create-namespace
         --set openebsNDM.enabled=false
         --set webhook.enabled=false
+        --set engines.replicated.mayastor.enabled=false
       environment:
         KUBECONFIG: "{{ kube_config_dir }}/config"
       register: openebs_install
