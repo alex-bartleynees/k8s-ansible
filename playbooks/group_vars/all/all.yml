@@ -3,6 +3,7 @@ docker_username: creativefree
 kubernetes_version: "latest"
 pod_network_cidr: "10.244.0.0/16"
 app_namespace: product-feedback
+database_namespace: database
 
 helm_charts:
   - name: "my-ingress-chart"
@@ -11,6 +12,14 @@ helm_charts:
     namespace: "product-feedback"
     set_values:
       - "ingress.namespace=product-feedback"
+  - name: "my-ingress-chart"
+    version: "0.3.0"
+    release_name: "portfolio-site-ingress"
+    namespace: "portfolio-site"
+    values_files:
+      - values.portfolio.yaml
+    set_values:
+      - "ingress.namespace=portfolio-site"
   - name: "cert-manager"
     version: "0.2.0"
     release_name: "product-feedback-cert"
@@ -21,6 +30,10 @@ helm_charts:
       - "issuers.type=letsencrypt"
       - "issuers.letsencrypt.name=letsencrypt-staging"
       - "issuers.letsencrypt.server=https://acme-staging-v02.api.letsencrypt.org/directory"
+  - name: "database"
+    version: "0.1.0"
+    release_name: "database"
+    namespace: "database"
   - name: "product-feedback-api"
     version: "0.3.0"
     release_name: "product-feedback-api"
@@ -29,3 +42,9 @@ helm_charts:
     version: "0.3.0"
     release_name: "product-feedback-app"
     namespace: "product-feedback"
+  - name: "portfolio-site"
+    version: "0.1.0"
+    release_name: "portfolio-site"
+    namespace: "portfolio-site"
+    set_values:
+      - "replicaCount=2"
