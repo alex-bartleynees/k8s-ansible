@@ -1,5 +1,5 @@
-- name: Check and resize disk
-  import_playbook: playbooks/disk-resize.yml
+#- name: Check and resize disk
+# import_playbook: playbooks/disk-resize.yml
 
 - name: Configure SELinux and Firewall
   import_playbook: playbooks/selinux-firewall.yml
