@@ -4,8 +4,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "rockylinux/9"
-  config.vm.box_version = "4.0.0"
+  config.vm.box = "generic/rocky9"
+  config.vm.box_version = "4.3.12"
 
   config.vm.define "k8s" do |k8s|
     k8s.vm.hostname = "k8s"
