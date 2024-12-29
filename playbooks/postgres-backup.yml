@@ -27,6 +27,22 @@
         state: directory
         mode: "0755"
 
+    - name: Create Secret for PostgreSQL credentials
+      copy:
+        dest: /tmp/postgres-backup/postgres-secret.yml
+        content: |
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: postgres-backup-credentials
+            namespace: {{ postgres_backup.namespace }}
+          type: Opaque
+          stringData:
+            POSTGRES_USER: "{{ postgres_backup.postgres_user }}"
+            POSTGRES_PASSWORD: "{{ postgres_backup.postgres_db_password }}"
+            S3_ACCESS_KEY_ID: "{{ postgres_backup.s3_access_key }}"
+            S3_SECRET_ACCESS_KEY: "{{ postgres_backup.s3_secret_key }}"
+
     - name: Create PostgreSQL backup manifest
       copy:
         dest: /tmp/postgres-backup/postgres-backup.yml
@@ -54,7 +70,7 @@
               spec:
                 containers:
                 - name: postgresql
-                  image: itbm/postgresql-backup-s3
+                  image: creativefree/postgresql-backup-s3
                   imagePullPolicy: Always
                   env:
                   - name: POSTGRES_DATABASE
@@ -64,13 +80,25 @@
                   - name: POSTGRES_PORT
                     value: "{{ postgres_backup.postgres_port }}"
                   - name: POSTGRES_PASSWORD
-                    value: "{{ postgres_backup.postgres_db_password }}"
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgres-backup-credentials
+                        key: POSTGRES_PASSWORD
                   - name: POSTGRES_USER
-                    value: "{{ postgres_backup.postgres_user }}"
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgres-backup-credentials
+                        key: POSTGRES_USER
                   - name: S3_ACCESS_KEY_ID
-                    value: "{{ postgres_backup.s3_access_key }}"
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgres-backup-credentials
+                        key: S3_ACCESS_KEY_ID
                   - name: S3_SECRET_ACCESS_KEY
-                    value: "{{ postgres_backup.s3_secret_key }}"
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgres-backup-credentials
+                        key: S3_SECRET_ACCESS_KEY
                   - name: S3_BUCKET
                     value: "{{ postgres_backup.s3_bucket }}"
                   - name: S3_ENDPOINT
@@ -79,11 +107,16 @@
                     value: "{{ postgres_backup.s3_prefix }}"
                   - name: SCHEDULE
                     value: "{{ postgres_backup.schedule }}"
+                  - name: DELETE_OLDER_THAN
+                    value: "7 days ago"
 
-    - name: Apply PostgreSQL backup manifest
-      command: kubectl apply -f /tmp/postgres-backup/postgres-backup.yml
+    - name: Apply Kubernetes manifests
+      command: kubectl apply -f /tmp/postgres-backup/{{ item }}
       environment:
         KUBECONFIG: "{{ kube_config_dir }}/config"
+      loop:
+        - postgres-secret.yml
+        - postgres-backup.yml
       register: backup_deployment
       changed_when: backup_deployment.rc == 0
 
