@@ -23,6 +23,7 @@
         --set controller.config.proxy-connect-timeout=10
         --set controller.config.proxy-read-timeout=120
         --set controller.config.proxy-send-timeout=120
+        --set controller.allowSnippetAnnotations=true
       environment:
         KUBECONFIG: "{{ kube_config_dir }}/config"
       register: nginx_install
