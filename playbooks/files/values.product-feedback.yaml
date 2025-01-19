@@ -23,7 +23,8 @@ ingress:
     read: "60"
     send: "60"
 
-  domain: product-feedback.alexbartleynees.com
+  hosts:
+    - domain: product-feedback.alexbartleynees.com
 
   namespace: default
 

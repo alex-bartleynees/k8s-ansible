@@ -29,6 +29,7 @@
         --namespace {{ item.namespace }}
         --create-namespace
         --set-string global.namespace={{ item.namespace }}
+        --reset-values
         {% if item.values_files is defined %}
         {% for values_file in item.values_files %}
         -f {{remote_values_dir}}/{{ values_file }}

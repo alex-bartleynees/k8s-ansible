@@ -22,7 +22,8 @@ ingress:
     read: "60"
     send: "60"
 
-  domain: alexbartleynees.com
+  hosts:
+    - domain: alexbartleynees.com
 
   namespace: default
 
