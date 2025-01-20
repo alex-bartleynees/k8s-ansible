@@ -1,6 +1,9 @@
 #- name: Check and resize disk
 # import_playbook: playbooks/disk-resize.yml
 
+- name: Cleanup
+  import_playbook: playbooks/cleanup.yml
+
 - name: Configure SELinux and Firewall
   import_playbook: playbooks/selinux-firewall.yml
 
@@ -30,6 +33,9 @@
 
 - name: Deploy Helm Charts
   import_playbook: playbooks/deploy-charts.yml
+
+- name: Postgres Backup
+  import_playbook: playbooks/postgres-backup.yml
 
 - name: Install k9s
   import_playbook: playbooks/k9s.yml

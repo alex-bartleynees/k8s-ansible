@@ -27,6 +27,14 @@
         state: directory
         mode: "0755"
 
+    - name: Create namespace if it doesn't exist
+      shell: |
+        kubectl create namespace {{ postgres_backup.namespace }} --dry-run=client -o yaml | kubectl apply -f -
+      environment:
+        KUBECONFIG: "{{ kube_config_dir }}/config"
+      register: namespace_result
+      changed_when: namespace_result.rc == 0
+
     - name: Create Secret for PostgreSQL credentials
       copy:
         dest: /tmp/postgres-backup/postgres-secret.yml
